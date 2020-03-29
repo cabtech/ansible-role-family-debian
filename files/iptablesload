@@ -1,0 +1,12 @@
+#!/bin/bash
+
+prog=$(basename $0)
+file=/etc/iptables.rules
+
+if [[ -r "$file" ]]; then
+	/sbin/iptables-restore < $file
+else
+	echo "$prog: Could not read $file"
+	exit 0 # do not return none zero as the interface will not come up
+fi
+exit 0

@@ -1,0 +1,19 @@
+# Ansible template for resolv.head.j2
+#
+{% if inventory_hostname in ct_hosts %}
+{% set NET=ct_hosts[inventory_hostname].network %}
+{% set SERVERS=ct_networks[NET].dns_servers + ct_external_dns %}
+{% set DOMAIN=ct_networks[NET].domain %}
+{% else %}
+{% set SERVERS=ct_external_dns %}
+{% endif %}
+
+{% for address in SERVERS %}
+nameserver {{address}}
+{% endfor %}
+{% if DOMAIN is defined %}
+domain {{DOMAIN}}
+search {{DOMAIN}}
+{% endif %}
+#
+# end template

@@ -1,0 +1,20 @@
+---
+debian_resolver_fragdir: /etc/resolvconf/resolv.conf.d
+
+debian_packages:
+# games:
+#   pkgs: ['aislesriot']
+#   state: absent
+# gnome:
+#   pkgs: ['gnome-calendar', 'gnome-mahjongg', 'gnome-mines', 'gnome-sudoku', 'gnome-todo', 'gnome-todo-common']
+#   state: absent
+# misc:
+#   pkgs: ['deja-dup', 'mailutils', 'mailutils-common', 'transmission-gtk', 'transmission-common']
+#   state: absent
+  utils:
+    pkgs: ['curl', 'dnsutils', 'dos2unix', 'expect', 'jq', 'p7zip-full', 'unzip', 'vim']
+    state: present
+  sys:
+    pkgs: ['cron', 'debian-keyring', 'iptables', 'nmap', 'openssh-client', 'openssh-server', 'python-apt', 'traceroute', 'whois']
+    state: present
+...

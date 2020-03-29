@@ -1,0 +1,15 @@
+---
+# --------------------------------
+#
+- name: 'handler_update_time'
+  command: ntpdate pool.ntp.org
+  become: true
+#
+# --------------------------------
+#
+- name: 'handler_resolv'
+  command: /sbin/resolvconf -u
+  become: true
+#
+# --------------------------------
+...

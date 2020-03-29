@@ -1,0 +1,186 @@
+---
+# --------------------------------
+
+- name: 'copy over Debian bash include'
+  copy:
+    src: debian.sh
+    dest: /usr/local/etc/bash.d/
+    owner: root
+    group: root
+    mode: 0644
+  when:
+  - ct_family == 'debian'
+  become: true
+  tags:
+  - debian
+  - debian-bash
+
+# --------------------------------
+
+- name: 'BLOCK for {{debian_resolver_fragdir}} tasks'
+  block:
+  - name: 'make sure {{debian_resolver_fragdir}} exists'
+    file:
+      path: '{{debian_resolver_fragdir}}'
+      state: directory
+      mode: '0755'
+      owner: root
+      group: root
+  - name: 'copy resolv.head'
+    template:
+      src: resolv.head.j2
+      dest: '{{debian_resolver_fragdir}}/head'
+      mode: 0644
+    notify: handler_resolv
+  - name: 'copy resolv.tail'
+    copy:
+      src: resolv.tail
+      dest: '{{debian_resolver_fragdir}}/tail'
+      mode: 0644
+    notify: handler_resolv
+  when:
+  - ct_family == 'debian'
+  - ct_write_resolver == true
+  - ct_distro != 'kali'  # TODO
+  - (ct_distro != 'ubuntu' or (ct_distro_major|int < 18))
+  become: true
+  tags:
+  - debian
+  - debian-dns
+  - x-dns
+
+# --------------------------------
+
+- name: 'handle various Debian packages'
+  apt:
+    pkg: '{{item.value.pkgs}}'
+    state: '{{item.value.state}}'
+  loop: '{{debian_packages|dict2items}}'
+  loop_control:
+    label: '{{item.key}}'
+  when:
+  - ct_family == 'debian'
+  become: true
+  tags:
+  - debian
+  - debian-pkg
+  - x-pkg
+
+- name: 'install developer packages'
+  apt:
+    pkg: ['exuberant-ctags', 'git']
+    state: present
+    update_cache: false
+  when:
+  - ct_family == 'debian'
+  become: true
+  tags:
+  - debian
+  - debian-pkg
+  - x-pkg
+
+- name: 'install system packages (~Tor,~DNS,~cloud)'
+  apt:
+    pkg: ['gparted', 'samba']
+    state: present
+  when:
+  - ct_family == 'debian'
+  - ct_cloud is not defined
+  - ct_dns_server == false
+  - ct_tor == false
+  - ct_provider is not defined
+  become: true
+  tags:
+  - debian
+  - debian-pkg
+  - x-pkg
+
+# --------------------------------
+
+- name: 'install NTP (TODO,do we need a handler?'  # TODO
+  apt:
+    pkg: ['ntp', 'ntpdate']
+    state: present
+  when:
+  - ct_family == 'debian'
+  become: true
+  tags:
+  - debian
+  - debian-pkg
+  - debian-time
+  - x-pkg
+  - x-time
+
+- name: 'make sure ssh daemon starts at boot'
+  service:
+    name: ssh
+    enabled: true
+  when:
+  - ct_family == 'debian'
+  become: true
+  tags:
+  - debian
+  - debian-svc
+  - x-svc
+
+# --------------------------------
+
+- name: 'install VMWare tools on Debian guests (~cloud)'
+  apt:
+    pkg: ['open-vm-tools', 'open-vm-tools-desktop']
+    state: present
+  become: true
+  when:
+  - ct_family == 'debian'
+  - ct_cloud is not defined
+  - ct_hypervisor == 'vmware'
+  - ct_vmware_tools_source == 'repo'
+  tags:
+  - debian
+  - debian-pkg
+  - x-pkg
+
+# --------------------------------
+
+- name: 'deploy file for loading iptables on reboot (TODO)'  # TODO
+  copy:
+    src: iptablesload
+    dest: /etc/network/if-pre-up.d
+    owner: root
+    mode: 0744
+  when:
+  - ct_family == 'debian'
+  - false
+  become: true
+  tags:
+  - debian
+  - debian-network
+  - debian-network-firewall
+  - x-firewall
+
+# --------------------------------
+
+- name: 'weekly clean of APT cache'
+  cron:
+    name: 'ansible-weekly-apt-clean'
+    state: present
+    disabled: false
+    user: 'root'
+    weekday: '0'  # Sunday
+    minute: '15'
+    hour: '*/1'
+    job: 'apt-get clean'
+    cron_file: 'ansible-weekly-apt-clean'
+  become: true
+  when:
+  - ct_family == 'debian'
+  - ct_container is not defined
+  - ct_provider is not defined
+  tags:
+  - debian
+  - debian-cron
+  - debian-hkp
+  - x-cron
+  - x-hkp
+
+...
