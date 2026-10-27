@@ -1,14 +1,16 @@
 ---
 # --------------------------------
 #
-- name: 'handler_update_time'
-  command: ntpdate pool.ntp.org
+- name: 'Handler_update_time'
+  ansible.builtin.command: ntpdate pool.ntp.org
+  changed_when: true
   become: true
 #
 # --------------------------------
 #
-- name: 'handler_resolv'
-  command: /sbin/resolvconf -u
+- name: 'Handler_resolv'
+  ansible.builtin.command: /sbin/resolvconf -u
+  changed_when: true
   become: true
 #
 # --------------------------------
