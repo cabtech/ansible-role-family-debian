@@ -9,7 +9,7 @@
     group: root
     mode: '0644'
   when:
-  - ct_family == 'debian'
+  - ansible_facts['os_family'] == 'Debian'
   become: true
   tags:
   - debian
@@ -19,10 +19,10 @@
 
 - name: 'Resolver fragments in {{ debian_resolver_fragdir }}'
   when:
-  - ct_family == 'debian'
+  - ansible_facts['os_family'] == 'Debian'
   - ct_write_resolver | bool
-  - ct_distro != 'kali'  # TODO
-  - (ct_distro != 'ubuntu' or (ct_distro_major | int < 18))
+  - ansible_facts['distribution'] != 'Kali'  # TODO
+  - (ansible_facts['distribution'] != 'Ubuntu' or (ansible_facts['distribution_major_version'] | int < 18))
   become: true
   tags:
   - debian
@@ -59,7 +59,7 @@
   loop_control:
     label: '{{ item.key }}'
   when:
-  - ct_family == 'debian'
+  - ansible_facts['os_family'] == 'Debian'
   become: true
   tags:
   - debian
@@ -72,7 +72,7 @@
     state: present
     update_cache: false
   when:
-  - ct_family == 'debian'
+  - ansible_facts['os_family'] == 'Debian'
   become: true
   tags:
   - debian
@@ -84,7 +84,7 @@
     pkg: ['gparted', 'samba']
     state: present
   when:
-  - ct_family == 'debian'
+  - ansible_facts['os_family'] == 'Debian'
   - ct_cloud is not defined
   - not (ct_dns_server | bool)
   - not (ct_tor | bool)
@@ -102,7 +102,7 @@
     pkg: ['ntp', 'ntpdate']
     state: present
   when:
-  - ct_family == 'debian'
+  - ansible_facts['os_family'] == 'Debian'
   become: true
   tags:
   - debian
@@ -116,7 +116,7 @@
     name: ssh
     enabled: true
   when:
-  - ct_family == 'debian'
+  - ansible_facts['os_family'] == 'Debian'
   become: true
   tags:
   - debian
@@ -131,9 +131,9 @@
     state: present
   become: true
   when:
-  - ct_family == 'debian'
+  - ansible_facts['os_family'] == 'Debian'
   - ct_cloud is not defined
-  - ct_hypervisor == 'vmware'
+  - ansible_facts['virtualization_type'] | default('') | lower == 'vmware'
   - ct_vmware_tools_source == 'repo'
   tags:
   - debian
@@ -149,7 +149,7 @@
     owner: root
     mode: '0744'
   when:
-  - ct_family == 'debian'
+  - ansible_facts['os_family'] == 'Debian'
   - false
   become: true
   tags:
@@ -173,7 +173,7 @@
     cron_file: 'ansible-weekly-apt-clean'
   become: true
   when:
-  - ct_family == 'debian'
+  - ansible_facts['os_family'] == 'Debian'
   - ct_container is not defined
   - ct_provider is not defined
   tags:
