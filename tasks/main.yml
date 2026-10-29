@@ -11,9 +11,7 @@
   when:
   - ansible_facts['os_family'] == 'Debian'
   become: true
-  tags:
-  - debian
-  - debian-bash
+  tags: ["debian"]
 
 # --------------------------------
 
@@ -24,10 +22,7 @@
   - ansible_facts['distribution'] != 'Kali'  # TODO
   - (ansible_facts['distribution'] != 'Ubuntu' or (ansible_facts['distribution_major_version'] | int < 18))
   become: true
-  tags:
-  - debian
-  - debian-dns
-  - x-dns
+  tags: ["debian"]
   block:
   - name: 'Make sure fragment directory exists: {{ debian_resolver_fragdir }}'
     ansible.builtin.file:
@@ -61,10 +56,7 @@
   when:
   - ansible_facts['os_family'] == 'Debian'
   become: true
-  tags:
-  - debian
-  - debian-pkg
-  - x-pkg
+  tags: ["debian"]
 
 - name: 'Install developer packages'
   ansible.builtin.apt:
@@ -74,10 +66,7 @@
   when:
   - ansible_facts['os_family'] == 'Debian'
   become: true
-  tags:
-  - debian
-  - debian-pkg
-  - x-pkg
+  tags: ["debian"]
 
 - name: 'Install system packages (~Tor,~DNS,~cloud)'
   ansible.builtin.apt:
@@ -90,10 +79,7 @@
   - not (ct_tor | bool)
   - ct_provider is not defined
   become: true
-  tags:
-  - debian
-  - debian-pkg
-  - x-pkg
+  tags: ["debian"]
 
 # --------------------------------
 
@@ -104,12 +90,7 @@
   when:
   - ansible_facts['os_family'] == 'Debian'
   become: true
-  tags:
-  - debian
-  - debian-pkg
-  - debian-time
-  - x-pkg
-  - x-time
+  tags: ["debian"]
 
 - name: 'Make sure ssh daemon starts at boot'
   ansible.builtin.service:
@@ -118,10 +99,7 @@
   when:
   - ansible_facts['os_family'] == 'Debian'
   become: true
-  tags:
-  - debian
-  - debian-svc
-  - x-svc
+  tags: ["debian"]
 
 # --------------------------------
 
@@ -135,10 +113,7 @@
   - ct_cloud is not defined
   - ansible_facts['virtualization_type'] | default('') | lower == 'vmware'
   - ct_vmware_tools_source == 'repo'
-  tags:
-  - debian
-  - debian-pkg
-  - x-pkg
+  tags: ["debian"]
 
 # --------------------------------
 
@@ -152,11 +127,7 @@
   - ansible_facts['os_family'] == 'Debian'
   - false
   become: true
-  tags:
-  - debian
-  - debian-network
-  - debian-network-firewall
-  - x-firewall
+  tags: ["debian"]
 
 # --------------------------------
 
@@ -176,11 +147,7 @@
   - ansible_facts['os_family'] == 'Debian'
   - ct_container is not defined
   - ct_provider is not defined
-  tags:
-  - debian
-  - debian-cron
-  - debian-hkp
-  - x-cron
-  - x-hkp
+  tags: ["debian"]
 
+# --------------------------------
 ...
